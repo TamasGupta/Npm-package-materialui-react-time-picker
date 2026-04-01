@@ -23,6 +23,8 @@
     "*.css"
   ],
   "scripts": {
+    "demo": "vite --config vite.demo.config.js",
+    "build:demo": "vite build --config vite.demo.config.js",
     "build": "vite build",
     "prepublishOnly": "npm run build"
   },
