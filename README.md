@@ -41,4 +41,8 @@ export default function Example() {
 }
 ```
 
-The package imports its own stylesheet automatically.
+The package injects its own stylesheet automatically. If your app prefers explicit CSS imports, this also works:
+
+```jsx
+import "materialui-react-time-picker/style.css";
+```

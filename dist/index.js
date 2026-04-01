@@ -1,7 +1,10 @@
 import { useCallback as e, useMemo as t, useRef as n, useState as r } from "react";
 import { jsx as i, jsxs as a } from "react/jsx-runtime";
+//#region src/style.css?inline
+var o = ".m3tp-overlay{z-index:99999;background:#00000073;justify-content:center;align-items:center;animation:.18s m3tp-fade-in;display:flex;position:fixed;inset:0}@keyframes m3tp-fade-in{0%{opacity:0}to{opacity:1}}.m3tp-dialog{-webkit-user-select:none;user-select:none;background:#fff;border-radius:28px;width:320px;padding:24px;animation:.22s cubic-bezier(.34,1.26,.64,1) m3tp-slide-up;box-shadow:0 8px 40px #0000002e}@keyframes m3tp-slide-up{0%{opacity:0;transform:translateY(24px)scale(.96)}to{opacity:1;transform:translateY(0)scale(1)}}.m3tp-header{margin-bottom:20px}.m3tp-label{color:#49454f;letter-spacing:.4px;margin-bottom:10px;font-size:12px;font-weight:500;display:block}.m3tp-display{justify-content:space-around;align-items:center;gap:4px;display:flex}.m3tp-seg{color:#1c1b1f;cursor:pointer;letter-spacing:-1px;background:#ece6f0;border:none;border-radius:12px;justify-content:center;align-items:center;width:80px;height:72px;font-size:32px;font-weight:400;line-height:1;transition:background .15s,color .15s;display:flex}.m3tp-seg.active{color:#fff;background:#8a32fa}.m3tp-seg:hover:not(.active){background:#e0d7f7}.m3tp-colon{color:#1c1b1f;padding:0 2px;font-size:32px;font-weight:300;line-height:1}.m3tp-ampm{border:1px solid #79747e;border-radius:10px;flex-direction:column;flex-shrink:0;height:72px;margin-left:8px;display:flex;overflow:hidden}.m3tp-ampm button{color:#49454f;cursor:pointer;background:0 0;border:none;flex:1;padding:0 14px;font-size:13px;font-weight:500;line-height:1;transition:background .15s,color .15s}.m3tp-ampm button:first-child{border-bottom:1px solid #79747e}.m3tp-ampm button.active{color:#21005d;background:#e8def8}.m3tp-ampm button:hover:not(.active){background:#f3edf7}.m3tp-clock-wrap{justify-content:center;margin-bottom:20px;display:flex}.m3tp-clock{cursor:pointer;touch-action:none;border-radius:50%;display:block}.m3tp-face{fill:#ece6f0}.m3tp-hand{stroke:#8a32fa;stroke-width:2px}.m3tp-center-dot,.m3tp-thumb{fill:#8a32fa}.m3tp-tick{fill:#1c1b1f;cursor:pointer;pointer-events:all;font-size:14px;font-weight:400}.m3tp-tick-active{fill:#fff;font-weight:500}.m3tp-footer{justify-content:flex-end;gap:8px;display:flex}.m3tp-btn{cursor:pointer;letter-spacing:.1px;background:0 0;border:none;border-radius:20px;padding:10px 20px;font-size:14px;font-weight:500;transition:background .15s}.m3tp-cancel{color:#8a32fa}.m3tp-cancel:hover{background:#f3edf7}.m3tp-ok{color:#8a32fa}.m3tp-ok:hover{background:#f3edf7}";
+//#endregion
 //#region src/MD3TimePicker.jsx
-function o({ value: o = null, onChange: s, onClose: c }) {
+function s({ value: o = null, onChange: s, onClose: c }) {
 	let l = o && o.getHours() % 12 || 12, u = o ? o.getMinutes() : 0, d = o && o.getHours() >= 12 ? "PM" : "AM", [f, p] = r("hour"), [m, h] = r(l), [g, _] = r(u), [v, y] = r(d), [b, x] = r(!1), S = n(null), C = t(() => {
 		let e = [];
 		for (let t = 1; t <= 12; t += 1) e.push(t);
@@ -169,4 +172,11 @@ function o({ value: o = null, onChange: s, onClose: c }) {
 	});
 }
 //#endregion
-export { o as default };
+//#region src/index.js
+var c = "materialui-react-time-picker-styles";
+if (typeof document < "u" && !document.getElementById(c)) {
+	let e = document.createElement("style");
+	e.id = c, e.textContent = o, document.head.appendChild(e);
+}
+//#endregion
+export { s as default };
