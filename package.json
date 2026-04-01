@@ -23,6 +23,7 @@
     "*.css"
   ],
   "scripts": {
+    "dev": "vite",
     "build": "vite build",
     "prepublishOnly": "npm run build"
   },

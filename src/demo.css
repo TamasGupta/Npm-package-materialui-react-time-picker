@@ -1,0 +1,83 @@
+:root {
+  font-family: Georgia, "Times New Roman", serif;
+  color: #241f17;
+  background:
+    radial-gradient(circle at top left, rgba(255, 240, 214, 0.95), transparent 35%),
+    linear-gradient(135deg, #f9f0de 0%, #efe4ce 52%, #e1d0b1 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.demo-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.demo-panel {
+  width: min(100%, 520px);
+  padding: 36px;
+  border-radius: 32px;
+  background: rgba(255, 252, 246, 0.82);
+  border: 1px solid rgba(92, 57, 21, 0.12);
+  box-shadow: 0 24px 60px rgba(91, 62, 28, 0.18);
+  backdrop-filter: blur(10px);
+}
+
+.demo-eyebrow {
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 12px;
+  color: #8a5b2b;
+}
+
+.demo-panel h1 {
+  margin: 0;
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  line-height: 0.95;
+}
+
+.demo-copy {
+  margin: 16px 0 18px;
+  max-width: 34ch;
+  font-size: 17px;
+  line-height: 1.5;
+  color: #59473a;
+}
+
+.demo-value {
+  margin: 0 0 28px;
+  font-size: 20px;
+  color: #35281e;
+}
+
+.demo-button {
+  border: 0;
+  border-radius: 999px;
+  padding: 14px 24px;
+  background: #241f17;
+  color: #fffaf2;
+  font-size: 16px;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+  box-shadow: 0 10px 24px rgba(36, 31, 23, 0.22);
+}
+
+.demo-button:hover {
+  transform: translateY(-1px);
+}
