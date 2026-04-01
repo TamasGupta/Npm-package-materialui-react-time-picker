@@ -42,12 +42,3 @@ export default function Example() {
 ```
 
 The package imports its own stylesheet automatically.
-
-## Publish
-
-```bash
-npm run build
-npm publish
-```
-
-If you want to publish under a personal or org scope, update the `name` field in `package.json` first.
