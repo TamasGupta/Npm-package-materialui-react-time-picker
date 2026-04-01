@@ -1,0 +1,222 @@
+/* ─── Material Design 3 Time Picker ─────────────────────────────────────────── */
+.m3tp-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  animation: m3tp-fade-in 0.18s ease;
+}
+
+@keyframes m3tp-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.m3tp-dialog {
+  background: #fff;
+  border-radius: 28px;
+  padding: 24px;
+  width: 320px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+  animation: m3tp-slide-up 0.22s cubic-bezier(0.34, 1.26, 0.64, 1);
+  user-select: none;
+}
+
+@keyframes m3tp-slide-up {
+  from {
+    transform: translateY(24px) scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Header */
+.m3tp-header {
+  margin-bottom: 20px;
+}
+
+.m3tp-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: #49454f;
+  letter-spacing: 0.4px;
+  margin-bottom: 10px;
+}
+
+/* HH:MM + AM/PM row */
+.m3tp-display {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: space-around;
+}
+
+.m3tp-seg {
+  background: #ece6f0;
+  border: none;
+  border-radius: 12px;
+  font-size: 32px;
+  font-weight: 400;
+  color: #1c1b1f;
+  width: 80px;
+  height: 72px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: -1px;
+}
+
+.m3tp-seg.active {
+  background: #8a32fa;
+  color: #fff;
+}
+
+.m3tp-seg:hover:not(.active) {
+  background: #e0d7f7;
+}
+
+.m3tp-colon {
+  font-size: 32px;
+  font-weight: 300;
+  color: #1c1b1f;
+  padding: 0 2px;
+  line-height: 1;
+}
+
+/* AM / PM stacked buttons */
+.m3tp-ampm {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #79747e;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-left: 8px;
+  height: 72px;
+  flex-shrink: 0;
+}
+
+.m3tp-ampm button {
+  flex: 1;
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: #49454f;
+  cursor: pointer;
+  padding: 0 14px;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+  line-height: 1;
+}
+
+.m3tp-ampm button:first-child {
+  border-bottom: 1px solid #79747e;
+}
+
+.m3tp-ampm button.active {
+  background: #e8def8;
+  color: #21005d;
+}
+
+.m3tp-ampm button:hover:not(.active) {
+  background: #f3edf7;
+}
+
+/* Clock wrap */
+.m3tp-clock-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+/* SVG clock */
+.m3tp-clock {
+  cursor: pointer;
+  border-radius: 50%;
+  display: block;
+  touch-action: none;
+}
+
+.m3tp-face {
+  fill: #ece6f0;
+}
+
+.m3tp-hand {
+  stroke: #8a32fa;
+  stroke-width: 2;
+}
+
+.m3tp-center-dot {
+  fill: #8a32fa;
+}
+
+.m3tp-thumb {
+  fill: #8a32fa;
+}
+
+/* Number ticks */
+.m3tp-tick {
+  font-size: 14px;
+  font-weight: 400;
+  fill: #1c1b1f;
+  cursor: pointer;
+  pointer-events: all;
+}
+
+.m3tp-tick-active {
+  fill: #fff;
+  font-weight: 500;
+}
+
+/* Footer */
+.m3tp-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.m3tp-btn {
+  border: none;
+  background: transparent;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  letter-spacing: 0.1px;
+}
+
+.m3tp-cancel {
+  color: #8a32fa;
+}
+
+.m3tp-cancel:hover {
+  background: #f3edf7;
+}
+
+.m3tp-ok {
+  color: #8a32fa;
+}
+
+.m3tp-ok:hover {
+  background: #f3edf7;
+}
+/* ─── End MD3 Time Picker ───────────────────────────────────────────────────── */
