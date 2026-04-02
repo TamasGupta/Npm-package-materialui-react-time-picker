@@ -10,15 +10,17 @@ function formatTime(value) {
   return value.toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
+    hour12: true,
   });
 }
 
-function formatClockLabel(value) {
+function formatClockLabel(value, format = "12h") {
   if (!value) return "--:--";
 
   return value.toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
+    hour12: format === "12h",
   });
 }
 
@@ -56,6 +58,7 @@ function App() {
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState(() => createCurrentTime());
   const [isManualSelection, setIsManualSelection] = useState(false);
+  const [format, setFormat] = useState("12h");
   const [preset] = useState(() => {
     const nextValue = new Date();
     nextValue.setHours(9, 30, 0, 0);
@@ -89,6 +92,23 @@ function App() {
             touch-friendly interactions, and npm-ready packaging.
           </p>
 
+          <div className="format-switch" role="group" aria-label="Time format">
+            <button
+              type="button"
+              className={`format-chip${format === "12h" ? " active" : ""}`}
+              onClick={() => setFormat("12h")}
+            >
+              12h
+            </button>
+            <button
+              type="button"
+              className={`format-chip${format === "24h" ? " active" : ""}`}
+              onClick={() => setFormat("24h")}
+            >
+              24h
+            </button>
+          </div>
+
           <div className="hero-actions">
             <button
               type="button"
@@ -107,20 +127,28 @@ function App() {
         <div className="hero-preview">
           <div className="preview-panel">
             <span className="panel-label">Selected time</span>
-            <p className="preview-time">{formatClockLabel(value)}</p>
-            <p className="preview-copy">{formatTime(value)}</p>
+            <p className="preview-time">{formatClockLabel(value, format)}</p>
+            <p className="preview-copy">
+              {format === "12h"
+                ? formatTime(value)
+                : `${formatClockLabel(value, "24h")} in 24-hour format`}
+            </p>
           </div>
 
           <div className="preview-grid">
             <article className="mini-card">
               <span className="mini-label">Preset example</span>
-              <strong>{formatClockLabel(preset)}</strong>
+              <strong>{formatClockLabel(preset, format)}</strong>
               <p>Useful for booking flows and schedule forms.</p>
             </article>
             <article className="mini-card">
               <span className="mini-label">Interaction</span>
-              <strong>Clock + AM/PM</strong>
-              <p>Tap, click, or drag across the dial to choose time.</p>
+              <strong>{format === "12h" ? "Clock + AM/PM" : "Direct 00-23 clock"}</strong>
+              <p>
+                {format === "12h"
+                  ? "Tap, click, or drag across the dial to choose time."
+                  : "Use the two-ring hour dial to select 00-23 directly."}
+              </p>
             </article>
           </div>
         </div>
@@ -143,6 +171,7 @@ function App() {
   value={value}
   onChange={setValue}
   onClose={() => setOpen(false)}
+  format="${format}"
   clockSize={240}
   theme={{
     accentColor: "#8e5636",
@@ -155,9 +184,9 @@ function App() {
         <article className="detail-card">
           <span className="detail-kicker">Current demo state</span>
           <ul className="stat-list">
-            <li>Selection: {formatTime(value)}</li>
+            <li>Selection: {formatClockLabel(value, format)}</li>
             <li>Dialog: {isOpen ? "Open" : "Closed"}</li>
-            <li>Format: 12-hour with AM/PM</li>
+            <li>Format: {format === "12h" ? "12-hour with AM/PM" : "24-hour direct selection"}</li>
           </ul>
         </article>
       </section>
@@ -165,6 +194,7 @@ function App() {
       {isOpen ? (
         <MD3TimePicker
           value={value}
+          format={format}
           clockSize={240}
           theme={demoTheme}
           onChange={(nextValue) => {

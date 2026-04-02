@@ -30,6 +30,7 @@ export interface MD3TimePickerProps {
   value?: Date | null;
   onChange?: (value: Date) => void;
   onClose?: () => void;
+  format?: "12h" | "24h";
   className?: string;
   style?: JSX.IntrinsicElements["div"]["style"];
   clockSize?: number;

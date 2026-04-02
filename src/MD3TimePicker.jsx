@@ -31,6 +31,35 @@ function getThemeStyles(theme = {}, clockSize = DEFAULT_CLOCK_SIZE) {
   };
 }
 
+function getPointerDetails(event, clockRef) {
+  const rect = clockRef.current?.getBoundingClientRect();
+  if (!rect) return null;
+
+  const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+  const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const dx = clientX - cx;
+  const dy = clientY - cy;
+  let angle = (Math.atan2(dy, dx) * 180) / Math.PI + 90;
+
+  if (angle < 0) angle += 360;
+
+  return {
+    angle,
+    distance: Math.sqrt(dx * dx + dy * dy),
+  };
+}
+
+function getHourFromAngle(angle) {
+  return Math.round(angle / 30) % 12;
+}
+
+function formatDisplayHour(hour, format) {
+  if (format === "24h") return String(hour).padStart(2, "0");
+  return String(hour % 12 || 12).padStart(2, "0");
+}
+
 /**
  * Material Design 3 style clock-face time picker.
  */
@@ -42,20 +71,23 @@ export default function MD3TimePicker({
   style,
   clockSize = DEFAULT_CLOCK_SIZE,
   theme,
+  format = "12h",
 }) {
-  const initHour = value ? value.getHours() % 12 || 12 : 12;
-  const initMinute = value ? value.getMinutes() : 0;
-  const initAmpm = value ? (value.getHours() >= 12 ? "PM" : "AM") : "AM";
+  const initialHours24 = value ? value.getHours() : 0;
+  const initialMinute = value ? value.getMinutes() : 0;
+  const initialAmpm = initialHours24 >= 12 ? "PM" : "AM";
 
   const [mode, setMode] = useState("hour");
-  const [hour, setHour] = useState(initHour);
-  const [minute, setMinute] = useState(initMinute);
-  const [ampm, setAmpm] = useState(initAmpm);
+  const [hour24, setHour24] = useState(initialHours24);
+  const [minute, setMinute] = useState(initialMinute);
+  const [ampm, setAmpm] = useState(initialAmpm);
   const [dragging, setDragging] = useState(false);
   const clockRef = useRef(null);
 
+  const is24Hour = format === "24h";
   const CLOCK_R = clockSize / 2;
-  const HAND_R = clockSize * 0.355;
+  const OUTER_HAND_R = clockSize * 0.355;
+  const INNER_HAND_R = clockSize * 0.235;
   const DOT_R = Math.max(4, clockSize * 0.018);
   const THUMB_R = Math.max(16, clockSize * 0.073);
   const rootStyle = {
@@ -64,67 +96,111 @@ export default function MD3TimePicker({
   };
 
   const hourTicks = useMemo(() => {
-    const items = [];
-    for (let i = 1; i <= 12; i += 1) items.push(i);
-    return items;
-  }, []);
+    if (!is24Hour) {
+      return Array.from({ length: 12 }, (_, index) => ({
+        value: index + 1,
+        label: String(index + 1),
+        radius: OUTER_HAND_R,
+      }));
+    }
 
-  const minuteTicks = useMemo(() => {
-    const items = [];
-    for (let i = 0; i < 60; i += 5) items.push(i);
-    return items;
-  }, []);
-
-  const getAngle = (val, total) => ((val / total) * 360 - 90 + 360) % 360;
-
-  const currentAngle =
-    mode === "hour"
-      ? getAngle(hour === 12 ? 0 : hour, 12)
-      : getAngle(minute, 60);
-
-  const handX = CLOCK_R + Math.cos((currentAngle * Math.PI) / 180) * HAND_R;
-  const handY = CLOCK_R + Math.sin((currentAngle * Math.PI) / 180) * HAND_R;
-
-  const tickPositions = (ticks, total, r) =>
-    ticks.map((val) => {
-      const angle = ((((val / total) * 360 - 90 + 360) % 360) * Math.PI) / 180;
+    const outerRing = Array.from({ length: 12 }, (_, index) => {
+      const value = index === 0 ? 0 : index + 12;
       return {
-        val,
-        x: CLOCK_R + Math.cos(angle) * r,
-        y: CLOCK_R + Math.sin(angle) * r,
+        value,
+        label: String(value).padStart(2, "0"),
+        radius: OUTER_HAND_R,
       };
     });
 
-  const hourPositions = tickPositions(hourTicks, 12, HAND_R);
-  const minutePositions = tickPositions(minuteTicks, 60, HAND_R);
-  const activeVal = mode === "hour" ? hour : minute;
+    const innerRing = Array.from({ length: 12 }, (_, index) => {
+      const value = index + 1;
+      return {
+        value,
+        label: String(value).padStart(2, "0"),
+        radius: INNER_HAND_R,
+      };
+    });
+
+    return [...outerRing, ...innerRing];
+  }, [INNER_HAND_R, OUTER_HAND_R, is24Hour]);
+
+  const minuteTicks = useMemo(
+    () =>
+      Array.from({ length: 12 }, (_, index) => ({
+        value: index * 5,
+        label: String(index * 5).padStart(2, "0"),
+        radius: OUTER_HAND_R,
+      })),
+    [OUTER_HAND_R],
+  );
+
+  const displayHour = formatDisplayHour(hour24, format);
+  const activeHourValue = is24Hour ? hour24 : hour24 % 12 || 12;
+  const hourHandRadius =
+    is24Hour && activeHourValue >= 1 && activeHourValue <= 12
+      ? INNER_HAND_R
+      : OUTER_HAND_R;
+  const currentAngle =
+    mode === "hour"
+      ? ((activeHourValue % 12) / 12) * 360 - 90
+      : (minute / 60) * 360 - 90;
+  const activeRadius = mode === "hour" ? hourHandRadius : OUTER_HAND_R;
+  const handX = CLOCK_R + Math.cos((currentAngle * Math.PI) / 180) * activeRadius;
+  const handY = CLOCK_R + Math.sin((currentAngle * Math.PI) / 180) * activeRadius;
+
+  const tickPositions = (ticks, total) =>
+    ticks.map(({ value: tickValue, label, radius }) => {
+      const angle = ((((tickValue % total) / total) * 360 - 90 + 360) % 360) * (Math.PI / 180);
+      return {
+        value: tickValue,
+        label,
+        x: CLOCK_R + Math.cos(angle) * radius,
+        y: CLOCK_R + Math.sin(angle) * radius,
+      };
+    });
+
+  const hourPositions = tickPositions(hourTicks, 12);
+  const minutePositions = tickPositions(minuteTicks, 60);
 
   const getValueFromEvent = useCallback(
     (event) => {
-      const rect = clockRef.current?.getBoundingClientRect();
-      if (!rect) return;
-
-      const clientX = event.touches ? event.touches[0].clientX : event.clientX;
-      const clientY = event.touches ? event.touches[0].clientY : event.clientY;
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      let angle = (Math.atan2(clientY - cy, clientX - cx) * 180) / Math.PI + 90;
-
-      if (angle < 0) angle += 360;
+      const pointer = getPointerDetails(event, clockRef);
+      if (!pointer) return;
 
       if (mode === "hour") {
-        let nextHour = Math.round(angle / 30);
-        if (nextHour === 0) nextHour = 12;
-        if (nextHour > 12) nextHour = 12;
-        setHour(nextHour);
+        const rawHour = getHourFromAngle(pointer.angle);
+
+        if (is24Hour) {
+          const ringBoundary = (OUTER_HAND_R + INNER_HAND_R) / 2;
+          const nextHour =
+            pointer.distance < ringBoundary
+              ? rawHour === 0
+                ? 12
+                : rawHour
+              : rawHour === 0
+                ? 0
+                : rawHour + 12;
+
+          setHour24(nextHour);
+          setAmpm(nextHour >= 12 ? "PM" : "AM");
+          return;
+        }
+
+        const nextHour = rawHour === 0 ? 12 : rawHour;
+        setHour24((currentHour) => {
+          const nextHours24 =
+            (ampm === "PM" ? 12 : 0) + (nextHour % 12);
+          return nextHours24;
+        });
         return;
       }
 
-      let nextMinute = Math.round(angle / 6);
+      let nextMinute = Math.round(pointer.angle / 6);
       if (nextMinute >= 60) nextMinute = 0;
       setMinute(nextMinute);
     },
-    [mode],
+    [INNER_HAND_R, OUTER_HAND_R, ampm, is24Hour, mode],
   );
 
   const handleMouseDown = (event) => {
@@ -138,20 +214,35 @@ export default function MD3TimePicker({
     getValueFromEvent(event);
   };
 
+  const advanceToMinutes = () => {
+    if (mode === "hour") setTimeout(() => setMode("minute"), 150);
+  };
+
   const handleMouseUp = (event) => {
     if (!dragging) return;
     setDragging(false);
     getValueFromEvent(event);
-    if (mode === "hour") setTimeout(() => setMode("minute"), 150);
+    advanceToMinutes();
   };
 
   const handleConfirm = () => {
-    let hours24 = hour % 12;
-    if (ampm === "PM") hours24 += 12;
-
     const nextValue = new Date();
+    const hours24 = is24Hour ? hour24 : (ampm === "PM" ? 12 : 0) + (hour24 % 12);
     nextValue.setHours(hours24, minute, 0, 0);
     onChange?.(nextValue);
+  };
+
+  const setHourFromClick = (nextHour) => {
+    if (is24Hour) {
+      setHour24(nextHour);
+      setAmpm(nextHour >= 12 ? "PM" : "AM");
+      advanceToMinutes();
+      return;
+    }
+
+    const normalizedHour = nextHour % 12;
+    setHour24((ampm === "PM" ? 12 : 0) + normalizedHour);
+    advanceToMinutes();
   };
 
   return (
@@ -168,7 +259,7 @@ export default function MD3TimePicker({
               className={`m3tp-seg${mode === "hour" ? " active" : ""}`}
               onClick={() => setMode("hour")}
             >
-              {String(hour).padStart(2, "0")}
+              {displayHour}
             </button>
 
             <span className="m3tp-colon">:</span>
@@ -181,22 +272,30 @@ export default function MD3TimePicker({
               {String(minute).padStart(2, "0")}
             </button>
 
-            <div className="m3tp-ampm">
-              <button
-                type="button"
-                className={ampm === "AM" ? "active" : ""}
-                onClick={() => setAmpm("AM")}
-              >
-                AM
-              </button>
-              <button
-                type="button"
-                className={ampm === "PM" ? "active" : ""}
-                onClick={() => setAmpm("PM")}
-              >
-                PM
-              </button>
-            </div>
+            {!is24Hour ? (
+              <div className="m3tp-ampm">
+                <button
+                  type="button"
+                  className={ampm === "AM" ? "active" : ""}
+                  onClick={() => {
+                    setAmpm("AM");
+                    setHour24((currentHour) => currentHour % 12);
+                  }}
+                >
+                  AM
+                </button>
+                <button
+                  type="button"
+                  className={ampm === "PM" ? "active" : ""}
+                  onClick={() => {
+                    setAmpm("PM");
+                    setHour24((currentHour) => (currentHour % 12) + 12);
+                  }}
+                >
+                  PM
+                </button>
+              </div>
+            ) : null}
           </div>
         </div>
 
@@ -217,7 +316,7 @@ export default function MD3TimePicker({
             onTouchMove={getValueFromEvent}
             onTouchEnd={() => {
               setDragging(false);
-              if (mode === "hour") setTimeout(() => setMode("minute"), 150);
+              advanceToMinutes();
             }}
           >
             <circle
@@ -243,25 +342,24 @@ export default function MD3TimePicker({
             <circle cx={handX} cy={handY} r={THUMB_R} className="m3tp-thumb" />
 
             {(mode === "hour" ? hourPositions : minutePositions).map(
-              ({ val, x, y }) => (
-                <g key={val}>
+              ({ value: tickValue, label, x, y }) => (
+                <g key={`${mode}-${tickValue}`}>
                   <text
                     x={x}
                     y={y}
                     textAnchor="middle"
                     dominantBaseline="central"
-                    className={`m3tp-tick${val === activeVal ? " m3tp-tick-active" : ""}`}
+                    className={`m3tp-tick${tickValue === (mode === "hour" ? activeHourValue : minute) ? " m3tp-tick-active" : ""}`}
                     onClick={() => {
                       if (mode === "hour") {
-                        setHour(val);
-                        setTimeout(() => setMode("minute"), 150);
+                        setHourFromClick(tickValue);
                         return;
                       }
 
-                      setMinute(val);
+                      setMinute(tickValue);
                     }}
                   >
-                    {mode === "minute" ? String(val).padStart(2, "0") : val}
+                    {label}
                   </text>
                 </g>
               ),

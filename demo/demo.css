@@ -105,6 +105,41 @@ pre {
   color: #58443a;
 }
 
+.format-switch {
+  display: inline-flex;
+  gap: 8px;
+  padding: 8px;
+  margin-top: 24px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.48);
+  border: 1px solid rgba(95, 63, 39, 0.08);
+}
+
+.format-chip {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #714729;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.format-chip.active {
+  background: linear-gradient(135deg, #8e5636 0%, #6d3c24 100%);
+  color: #fff7f0;
+  box-shadow: 0 10px 22px rgba(109, 60, 36, 0.2);
+}
+
+.format-chip:hover {
+  transform: translateY(-1px);
+}
+
 .hero-actions {
   display: flex;
   flex-wrap: wrap;

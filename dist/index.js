@@ -30,43 +30,110 @@ function c(e = {}, t = s) {
 		"--m3tp-tick-font-size": e.tickFontSize
 	};
 }
-function l({ value: o = null, onChange: l, onClose: u, className: d = "", style: f, clockSize: p = s, theme: m }) {
-	let h = o && o.getHours() % 12 || 12, g = o ? o.getMinutes() : 0, _ = o && o.getHours() >= 12 ? "PM" : "AM", [v, y] = r("hour"), [b, x] = r(h), [S, C] = r(g), [w, T] = r(_), [E, D] = r(!1), O = n(null), k = p / 2, A = p * .355, j = Math.max(4, p * .018), M = Math.max(16, p * .073), N = {
-		...c(m, p),
-		...f
-	}, P = t(() => {
-		let e = [];
-		for (let t = 1; t <= 12; t += 1) e.push(t);
-		return e;
-	}, []), F = t(() => {
-		let e = [];
-		for (let t = 0; t < 60; t += 5) e.push(t);
-		return e;
-	}, []), I = (e, t) => (e / t * 360 - 90 + 360) % 360, L = v === "hour" ? I(b === 12 ? 0 : b, 12) : I(S, 60), R = k + Math.cos(L * Math.PI / 180) * A, z = k + Math.sin(L * Math.PI / 180) * A, B = (e, t, n) => e.map((e) => {
-		let r = (e / t * 360 - 90 + 360) % 360 * Math.PI / 180;
+function l(e, t) {
+	let n = t.current?.getBoundingClientRect();
+	if (!n) return null;
+	let r = e.touches ? e.touches[0].clientX : e.clientX, i = e.touches ? e.touches[0].clientY : e.clientY, a = n.left + n.width / 2, o = n.top + n.height / 2, s = r - a, c = i - o, l = Math.atan2(c, s) * 180 / Math.PI + 90;
+	return l < 0 && (l += 360), {
+		angle: l,
+		distance: Math.sqrt(s * s + c * c)
+	};
+}
+function u(e) {
+	return Math.round(e / 30) % 12;
+}
+function d(e, t) {
+	return t === "24h" ? String(e).padStart(2, "0") : String(e % 12 || 12).padStart(2, "0");
+}
+function f({ value: o = null, onChange: f, onClose: p, className: m = "", style: h, clockSize: g = s, theme: _, format: v = "12h" }) {
+	let y = o ? o.getHours() : 0, b = o ? o.getMinutes() : 0, x = y >= 12 ? "PM" : "AM", [S, C] = r("hour"), [w, T] = r(y), [E, D] = r(b), [O, k] = r(x), [A, j] = r(!1), M = n(null), N = v === "24h", P = g / 2, F = g * .355, I = g * .235, L = Math.max(4, g * .018), R = Math.max(16, g * .073), ee = {
+		...c(_, g),
+		...h
+	}, z = t(() => {
+		if (!N) return Array.from({ length: 12 }, (e, t) => ({
+			value: t + 1,
+			label: String(t + 1),
+			radius: F
+		}));
+		let e = Array.from({ length: 12 }, (e, t) => {
+			let n = t === 0 ? 0 : t + 12;
+			return {
+				value: n,
+				label: String(n).padStart(2, "0"),
+				radius: F
+			};
+		}), t = Array.from({ length: 12 }, (e, t) => {
+			let n = t + 1;
+			return {
+				value: n,
+				label: String(n).padStart(2, "0"),
+				radius: I
+			};
+		});
+		return [...e, ...t];
+	}, [
+		I,
+		F,
+		N
+	]), B = t(() => Array.from({ length: 12 }, (e, t) => ({
+		value: t * 5,
+		label: String(t * 5).padStart(2, "0"),
+		radius: F
+	})), [F]), V = d(w, v), H = N ? w : w % 12 || 12, U = N && H >= 1 && H <= 12 ? I : F, W = S === "hour" ? H % 12 / 12 * 360 - 90 : E / 60 * 360 - 90, G = S === "hour" ? U : F, K = P + Math.cos(W * Math.PI / 180) * G, q = P + Math.sin(W * Math.PI / 180) * G, J = (e, t) => e.map(({ value: e, label: n, radius: r }) => {
+		let i = (e % t / t * 360 - 90 + 360) % 360 * (Math.PI / 180);
 		return {
-			val: e,
-			x: k + Math.cos(r) * n,
-			y: k + Math.sin(r) * n
+			value: e,
+			label: n,
+			x: P + Math.cos(i) * r,
+			y: P + Math.sin(i) * r
 		};
-	}), V = B(P, 12, A), H = B(F, 60, A), U = v === "hour" ? b : S, W = e((e) => {
-		let t = O.current?.getBoundingClientRect();
+	}), Y = J(z, 12), X = J(B, 60), Z = e((e) => {
+		let t = l(e, M);
 		if (!t) return;
-		let n = e.touches ? e.touches[0].clientX : e.clientX, r = e.touches ? e.touches[0].clientY : e.clientY, i = t.left + t.width / 2, a = t.top + t.height / 2, o = Math.atan2(r - a, n - i) * 180 / Math.PI + 90;
-		if (o < 0 && (o += 360), v === "hour") {
-			let e = Math.round(o / 30);
-			e === 0 && (e = 12), e > 12 && (e = 12), x(e);
+		if (S === "hour") {
+			let e = u(t.angle);
+			if (N) {
+				let n = (F + I) / 2, r = t.distance < n ? e === 0 ? 12 : e : e === 0 ? 0 : e + 12;
+				T(r), k(r >= 12 ? "PM" : "AM");
+				return;
+			}
+			let n = e === 0 ? 12 : e;
+			T((e) => (O === "PM" ? 12 : 0) + n % 12);
 			return;
 		}
-		let s = Math.round(o / 6);
-		s >= 60 && (s = 0), C(s);
-	}, [v]);
+		let n = Math.round(t.angle / 6);
+		n >= 60 && (n = 0), D(n);
+	}, [
+		I,
+		F,
+		O,
+		N,
+		S
+	]), Q = (e) => {
+		e.preventDefault(), j(!0), Z(e);
+	}, te = (e) => {
+		A && Z(e);
+	}, $ = () => {
+		S === "hour" && setTimeout(() => C("minute"), 150);
+	}, ne = (e) => {
+		A && (j(!1), Z(e), $());
+	}, re = () => {
+		let e = /* @__PURE__ */ new Date(), t = N ? w : (O === "PM" ? 12 : 0) + w % 12;
+		e.setHours(t, E, 0, 0), f?.(e);
+	}, ie = (e) => {
+		if (N) {
+			T(e), k(e >= 12 ? "PM" : "AM"), $();
+			return;
+		}
+		let t = e % 12;
+		T((O === "PM" ? 12 : 0) + t), $();
+	};
 	return /* @__PURE__ */ i("div", {
 		className: "m3tp-overlay",
-		style: N,
-		onClick: u,
+		style: ee,
+		onClick: p,
 		children: /* @__PURE__ */ a("div", {
-			className: `m3tp-dialog${d ? ` ${d}` : ""}`,
+			className: `m3tp-dialog${m ? ` ${m}` : ""}`,
 			onClick: (e) => e.stopPropagation(),
 			children: [
 				/* @__PURE__ */ a("div", {
@@ -79,9 +146,9 @@ function l({ value: o = null, onChange: l, onClose: u, className: d = "", style:
 						children: [
 							/* @__PURE__ */ i("button", {
 								type: "button",
-								className: `m3tp-seg${v === "hour" ? " active" : ""}`,
-								onClick: () => y("hour"),
-								children: String(b).padStart(2, "0")
+								className: `m3tp-seg${S === "hour" ? " active" : ""}`,
+								onClick: () => C("hour"),
+								children: V
 							}),
 							/* @__PURE__ */ i("span", {
 								className: "m3tp-colon",
@@ -89,21 +156,25 @@ function l({ value: o = null, onChange: l, onClose: u, className: d = "", style:
 							}),
 							/* @__PURE__ */ i("button", {
 								type: "button",
-								className: `m3tp-seg${v === "minute" ? " active" : ""}`,
-								onClick: () => y("minute"),
-								children: String(S).padStart(2, "0")
+								className: `m3tp-seg${S === "minute" ? " active" : ""}`,
+								onClick: () => C("minute"),
+								children: String(E).padStart(2, "0")
 							}),
-							/* @__PURE__ */ a("div", {
+							N ? null : /* @__PURE__ */ a("div", {
 								className: "m3tp-ampm",
 								children: [/* @__PURE__ */ i("button", {
 									type: "button",
-									className: w === "AM" ? "active" : "",
-									onClick: () => T("AM"),
+									className: O === "AM" ? "active" : "",
+									onClick: () => {
+										k("AM"), T((e) => e % 12);
+									},
 									children: "AM"
 								}), /* @__PURE__ */ i("button", {
 									type: "button",
-									className: w === "PM" ? "active" : "",
-									onClick: () => T("PM"),
+									className: O === "PM" ? "active" : "",
+									onClick: () => {
+										k("PM"), T((e) => e % 12 + 12);
+									},
 									children: "PM"
 								})]
 							})
@@ -113,68 +184,62 @@ function l({ value: o = null, onChange: l, onClose: u, className: d = "", style:
 				/* @__PURE__ */ i("div", {
 					className: "m3tp-clock-wrap",
 					children: /* @__PURE__ */ a("svg", {
-						ref: O,
-						width: k * 2,
-						height: k * 2,
+						ref: M,
+						width: P * 2,
+						height: P * 2,
 						className: "m3tp-clock",
-						onMouseDown: (e) => {
-							e.preventDefault(), D(!0), W(e);
-						},
-						onMouseMove: (e) => {
-							E && W(e);
-						},
-						onMouseUp: (e) => {
-							E && (D(!1), W(e), v === "hour" && setTimeout(() => y("minute"), 150));
-						},
-						onMouseLeave: () => E && D(!1),
+						onMouseDown: Q,
+						onMouseMove: te,
+						onMouseUp: ne,
+						onMouseLeave: () => A && j(!1),
 						onTouchStart: (e) => {
-							D(!0), W(e);
+							j(!0), Z(e);
 						},
-						onTouchMove: W,
+						onTouchMove: Z,
 						onTouchEnd: () => {
-							D(!1), v === "hour" && setTimeout(() => y("minute"), 150);
+							j(!1), $();
 						},
 						children: [
 							/* @__PURE__ */ i("circle", {
-								cx: k,
-								cy: k,
-								r: k - 2,
+								cx: P,
+								cy: P,
+								r: P - 2,
 								className: "m3tp-face"
 							}),
 							/* @__PURE__ */ i("line", {
-								x1: k,
-								y1: k,
-								x2: R,
-								y2: z,
+								x1: P,
+								y1: P,
+								x2: K,
+								y2: q,
 								className: "m3tp-hand"
 							}),
 							/* @__PURE__ */ i("circle", {
-								cx: k,
-								cy: k,
-								r: j,
+								cx: P,
+								cy: P,
+								r: L,
 								className: "m3tp-center-dot"
 							}),
 							/* @__PURE__ */ i("circle", {
-								cx: R,
-								cy: z,
-								r: M,
+								cx: K,
+								cy: q,
+								r: R,
 								className: "m3tp-thumb"
 							}),
-							(v === "hour" ? V : H).map(({ val: e, x: t, y: n }) => /* @__PURE__ */ i("g", { children: /* @__PURE__ */ i("text", {
-								x: t,
-								y: n,
+							(S === "hour" ? Y : X).map(({ value: e, label: t, x: n, y: r }) => /* @__PURE__ */ i("g", { children: /* @__PURE__ */ i("text", {
+								x: n,
+								y: r,
 								textAnchor: "middle",
 								dominantBaseline: "central",
-								className: `m3tp-tick${e === U ? " m3tp-tick-active" : ""}`,
+								className: `m3tp-tick${e === (S === "hour" ? H : E) ? " m3tp-tick-active" : ""}`,
 								onClick: () => {
-									if (v === "hour") {
-										x(e), setTimeout(() => y("minute"), 150);
+									if (S === "hour") {
+										ie(e);
 										return;
 									}
-									C(e);
+									D(e);
 								},
-								children: v === "minute" ? String(e).padStart(2, "0") : e
-							}) }, e))
+								children: t
+							}) }, `${S}-${e}`))
 						]
 					})
 				}),
@@ -183,17 +248,12 @@ function l({ value: o = null, onChange: l, onClose: u, className: d = "", style:
 					children: [/* @__PURE__ */ i("button", {
 						type: "button",
 						className: "m3tp-btn m3tp-cancel",
-						onClick: u,
+						onClick: p,
 						children: "Cancel"
 					}), /* @__PURE__ */ i("button", {
 						type: "button",
 						className: "m3tp-btn m3tp-ok",
-						onClick: () => {
-							let e = b % 12;
-							w === "PM" && (e += 12);
-							let t = /* @__PURE__ */ new Date();
-							t.setHours(e, S, 0, 0), l?.(t);
-						},
+						onClick: re,
 						children: "OK"
 					})]
 				})
@@ -203,10 +263,10 @@ function l({ value: o = null, onChange: l, onClose: u, className: d = "", style:
 }
 //#endregion
 //#region src/index.js
-var u = "materialui-react-time-picker-styles";
-if (typeof document < "u" && !document.getElementById(u)) {
+var p = "materialui-react-time-picker-styles";
+if (typeof document < "u" && !document.getElementById(p)) {
 	let e = document.createElement("style");
-	e.id = u, e.textContent = o, document.head.appendChild(e);
+	e.id = p, e.textContent = o, document.head.appendChild(e);
 }
 //#endregion
-export { l as default };
+export { f as default };

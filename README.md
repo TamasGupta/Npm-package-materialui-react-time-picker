@@ -37,6 +37,7 @@ export default function Example() {
       {open ? (
         <MD3TimePicker
           value={value}
+          format="24h"
           clockSize={240}
           theme={{
             accentColor: "#8e5636",
@@ -65,6 +66,8 @@ import "materialui-react-time-picker/style.css";
 ## Styling
 
 You can customize the picker through the `theme` prop and resize the clock with `clockSize`.
+
+Set `format="12h"` for an AM/PM picker or `format="24h"` for direct `00-23` selection.
 
 Available theme keys include:
 
