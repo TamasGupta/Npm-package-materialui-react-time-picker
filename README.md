@@ -81,20 +81,6 @@ Available theme keys include:
 - `overlayBackground`
 - `fontFamily`
 
-## Demo Page
-
-Run the demo locally:
-
-```bash
-npm run demo
-```
-
-Build the static demo page:
-
-```bash
-npm run build:demo
-```
-
 Live demo:
 
 https://tamasgupta.github.io/Npm-package-materialui-react-time-picker/
