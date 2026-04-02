@@ -29,15 +29,18 @@
     "prepublishOnly": "npm run build"
   },
   "keywords": [
+    "react",
     "react-time-picker",
-    "time picker",
-    "materialui-time-picker",
-    "updated",
-    "most downloaded",
-    "ui",
-    "design"
+    "time-picker",
+    "timepicker",
+    "material-ui",
+    "mui",
+    "material-design",
+    "md3",
+    "clock-picker",
+    "component"
   ],
-  "author": "",
+  "author": "thomas gupta <thomasgupta9759@gmail.com>",
   "license": "ISC",
   "homepage": "https://tamasgupta.github.io/Npm-package-materialui-react-time-picker/",
   "repository": {

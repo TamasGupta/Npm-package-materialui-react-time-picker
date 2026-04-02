@@ -43,7 +43,7 @@ export default function Example() {
             accentColor: "#8e5636",
             dialogBackground: "#fff7ef",
             clockFaceBackground: "#f4e2d3",
-            buttonColor: "#8e5636"
+            buttonColor: "#8e5636",
           }}
           onChange={(nextValue) => {
             setValue(nextValue);
@@ -83,7 +83,18 @@ Available theme keys include:
 
 ## Demo Page
 
+Run the demo locally:
+
+```bash
+npm run demo
 ```
 
-The generated demo site is written to `demo-dist/`.
+Build the static demo page:
+
+```bash
+npm run build:demo
 ```
+
+Live demo:
+
+https://tamasgupta.github.io/Npm-package-materialui-react-time-picker/
