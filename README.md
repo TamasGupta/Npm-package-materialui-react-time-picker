@@ -2,6 +2,14 @@
 
 A Material Design 3 style React time picker packaged for npm distribution.
 
+## Live Demo
+
+https://tamasgupta.github.io/Npm-package-materialui-react-time-picker/
+
+## Repository
+
+https://github.com/tamasgupta/Npm-package-materialui-react-time-picker
+
 ## Install
 
 ```bash
@@ -45,4 +53,11 @@ The package injects its own stylesheet automatically. If your app prefers explic
 
 ```jsx
 import "materialui-react-time-picker/style.css";
+```
+
+## Demo Page
+
+```
+
+The generated demo site is written to `demo-dist/`.
 ```

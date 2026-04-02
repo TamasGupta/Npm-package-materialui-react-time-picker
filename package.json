@@ -39,6 +39,14 @@
   ],
   "author": "",
   "license": "ISC",
+  "homepage": "https://tamasgupta.github.io/Npm-package-materialui-react-time-picker/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tamasgupta/Npm-package-materialui-react-time-picker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tamasgupta/Npm-package-materialui-react-time-picker/issues"
+  },
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18"

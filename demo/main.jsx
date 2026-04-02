@@ -1,4 +1,4 @@
-import { StrictMode, useState } from "react";
+import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import MD3TimePicker from "materialui-react-time-picker";
 import "./demo.css";
@@ -21,14 +21,32 @@ function formatClockLabel(value) {
   });
 }
 
+function createCurrentTime() {
+  return new Date();
+}
+
 function App() {
   const [isOpen, setIsOpen] = useState(false);
-  const [value, setValue] = useState(null);
+  const [value, setValue] = useState(() => createCurrentTime());
+  const [isManualSelection, setIsManualSelection] = useState(false);
   const [preset] = useState(() => {
     const nextValue = new Date();
     nextValue.setHours(9, 30, 0, 0);
     return nextValue;
   });
+
+  useEffect(() => {
+    if (isManualSelection) return undefined;
+
+    const syncCurrentTime = () => {
+      setValue(createCurrentTime());
+    };
+
+    syncCurrentTime();
+    const timer = window.setInterval(syncCurrentTime, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [isManualSelection]);
 
   return (
     <main className="demo-shell">
@@ -116,6 +134,7 @@ function App() {
         <MD3TimePicker
           value={value}
           onChange={(nextValue) => {
+            setIsManualSelection(true);
             setValue(nextValue);
             setIsOpen(false);
           }}
