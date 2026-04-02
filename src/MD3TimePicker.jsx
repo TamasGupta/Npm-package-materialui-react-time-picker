@@ -1,5 +1,36 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 
+const DEFAULT_CLOCK_SIZE = 220;
+
+function getThemeStyles(theme = {}, clockSize = DEFAULT_CLOCK_SIZE) {
+  return {
+    "--m3tp-overlay-bg": theme.overlayBackground,
+    "--m3tp-dialog-bg": theme.dialogBackground,
+    "--m3tp-dialog-color": theme.textColor,
+    "--m3tp-dialog-radius": theme.dialogBorderRadius,
+    "--m3tp-dialog-shadow": theme.dialogShadow,
+    "--m3tp-label-color": theme.labelColor,
+    "--m3tp-segment-bg": theme.segmentBackground,
+    "--m3tp-segment-color": theme.segmentTextColor,
+    "--m3tp-segment-active-bg": theme.segmentActiveBackground,
+    "--m3tp-segment-active-color": theme.segmentActiveTextColor,
+    "--m3tp-segment-hover-bg": theme.segmentHoverBackground,
+    "--m3tp-border-color": theme.borderColor,
+    "--m3tp-ampm-active-bg": theme.ampmActiveBackground,
+    "--m3tp-ampm-active-color": theme.ampmActiveTextColor,
+    "--m3tp-ampm-hover-bg": theme.ampmHoverBackground,
+    "--m3tp-clock-face": theme.clockFaceBackground,
+    "--m3tp-accent": theme.accentColor,
+    "--m3tp-tick-color": theme.tickColor,
+    "--m3tp-tick-active-color": theme.tickActiveColor,
+    "--m3tp-button-color": theme.buttonColor,
+    "--m3tp-button-hover-bg": theme.buttonHoverBackground,
+    "--m3tp-font-family": theme.fontFamily,
+    "--m3tp-clock-size": `${clockSize}px`,
+    "--m3tp-tick-font-size": theme.tickFontSize,
+  };
+}
+
 /**
  * Material Design 3 style clock-face time picker.
  */
@@ -7,6 +38,10 @@ export default function MD3TimePicker({
   value = null,
   onChange,
   onClose,
+  className = "",
+  style,
+  clockSize = DEFAULT_CLOCK_SIZE,
+  theme,
 }) {
   const initHour = value ? value.getHours() % 12 || 12 : 12;
   const initMinute = value ? value.getMinutes() : 0;
@@ -19,9 +54,14 @@ export default function MD3TimePicker({
   const [dragging, setDragging] = useState(false);
   const clockRef = useRef(null);
 
-  const CLOCK_R = 110;
-  const HAND_R = 78;
-  const DOT_R = 4;
+  const CLOCK_R = clockSize / 2;
+  const HAND_R = clockSize * 0.355;
+  const DOT_R = Math.max(4, clockSize * 0.018);
+  const THUMB_R = Math.max(16, clockSize * 0.073);
+  const rootStyle = {
+    ...getThemeStyles(theme, clockSize),
+    ...style,
+  };
 
   const hourTicks = useMemo(() => {
     const items = [];
@@ -115,8 +155,11 @@ export default function MD3TimePicker({
   };
 
   return (
-    <div className="m3tp-overlay" onClick={onClose}>
-      <div className="m3tp-dialog" onClick={(event) => event.stopPropagation()}>
+    <div className="m3tp-overlay" style={rootStyle} onClick={onClose}>
+      <div
+        className={`m3tp-dialog${className ? ` ${className}` : ""}`}
+        onClick={(event) => event.stopPropagation()}
+      >
         <div className="m3tp-header">
           <span className="m3tp-label">Select time</span>
           <div className="m3tp-display">
@@ -197,7 +240,7 @@ export default function MD3TimePicker({
               r={DOT_R}
               className="m3tp-center-dot"
             />
-            <circle cx={handX} cy={handY} r={16} className="m3tp-thumb" />
+            <circle cx={handX} cy={handY} r={THUMB_R} className="m3tp-thumb" />
 
             {(mode === "hour" ? hourPositions : minutePositions).map(
               ({ val, x, y }) => (

@@ -37,6 +37,13 @@ export default function Example() {
       {open ? (
         <MD3TimePicker
           value={value}
+          clockSize={240}
+          theme={{
+            accentColor: "#8e5636",
+            dialogBackground: "#fff7ef",
+            clockFaceBackground: "#f4e2d3",
+            buttonColor: "#8e5636"
+          }}
           onChange={(nextValue) => {
             setValue(nextValue);
             setOpen(false);
@@ -54,6 +61,22 @@ The package injects its own stylesheet automatically. If your app prefers explic
 ```jsx
 import "materialui-react-time-picker/style.css";
 ```
+
+## Styling
+
+You can customize the picker through the `theme` prop and resize the clock with `clockSize`.
+
+Available theme keys include:
+
+- `accentColor`
+- `dialogBackground`
+- `textColor`
+- `clockFaceBackground`
+- `segmentBackground`
+- `segmentActiveBackground`
+- `buttonColor`
+- `overlayBackground`
+- `fontFamily`
 
 ## Demo Page
 

@@ -26,6 +26,32 @@ function createCurrentTime() {
   return new Date();
 }
 
+const demoTheme = {
+  overlayBackground: "rgba(60, 33, 18, 0.28)",
+  dialogBackground: "#fff7ef",
+  textColor: "#241611",
+  dialogBorderRadius: "30px",
+  dialogShadow: "0 28px 80px rgba(96, 58, 27, 0.28)",
+  labelColor: "#8c5e38",
+  segmentBackground: "#f0dfcf",
+  segmentTextColor: "#3f261b",
+  segmentActiveBackground: "#8e5636",
+  segmentActiveTextColor: "#fff7f0",
+  segmentHoverBackground: "#e7d2bf",
+  borderColor: "#b99172",
+  ampmActiveBackground: "#f1d7bf",
+  ampmActiveTextColor: "#6b3c21",
+  ampmHoverBackground: "#f8e7d8",
+  clockFaceBackground: "#f4e2d3",
+  accentColor: "#8e5636",
+  tickColor: "#362017",
+  tickActiveColor: "#fff7f0",
+  buttonColor: "#8e5636",
+  buttonHoverBackground: "#f3e0cf",
+  fontFamily: "\"Space Grotesk\", \"Segoe UI\", sans-serif",
+  tickFontSize: "13px",
+};
+
 function App() {
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState(() => createCurrentTime());
@@ -117,6 +143,11 @@ function App() {
   value={value}
   onChange={setValue}
   onClose={() => setOpen(false)}
+  clockSize={240}
+  theme={{
+    accentColor: "#8e5636",
+    dialogBackground: "#fff7ef"
+  }}
 />`}
           </pre>
         </article>
@@ -134,6 +165,8 @@ function App() {
       {isOpen ? (
         <MD3TimePicker
           value={value}
+          clockSize={240}
+          theme={demoTheme}
           onChange={(nextValue) => {
             setIsManualSelection(true);
             setValue(nextValue);
