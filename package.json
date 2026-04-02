@@ -23,9 +23,9 @@
     "*.css"
   ],
   "scripts": {
-    "demo": "vite --config vite.demo.config.js",
-    "build:demo": "vite build --config vite.demo.config.js",
-    "build": "vite build",
+    "demo": "node ./node_modules/vite/bin/vite.js --config vite.demo.config.js",
+    "build:demo": "node ./node_modules/vite/bin/vite.js build --config vite.demo.config.js",
+    "build": "node ./node_modules/vite/bin/vite.js build",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
