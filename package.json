@@ -1,6 +1,6 @@
 {
   "name": "materialui-react-time-picker",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Material Design 3 style React time picker component",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -29,11 +29,13 @@
     "prepublishOnly": "npm run build"
   },
   "keywords": [
-    "react",
-    "time-picker",
-    "material-design",
-    "mui",
-    "component"
+    "react-time-picker",
+    "time picker",
+    "materialui-time-picker",
+    "updated",
+    "most downloaded",
+    "ui",
+    "design"
   ],
   "author": "",
   "license": "ISC",
