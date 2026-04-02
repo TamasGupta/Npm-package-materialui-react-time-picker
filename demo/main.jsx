@@ -1,6 +1,7 @@
 import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import MD3TimePicker from "materialui-react-time-picker";
+import "../src/style.css";
 import "./demo.css";
 
 function formatTime(value) {
