@@ -46,32 +46,3 @@ The package injects its own stylesheet automatically. If your app prefers explic
 ```jsx
 import "materialui-react-time-picker/style.css";
 ```
-
-## Demo Page
-
-Run the demo locally:
-
-```bash
-npm run demo
-```
-
-Build the static demo page:
-
-```bash
-npm run build:demo
-```
-
-The generated demo site is written to `demo-dist/`. You can deploy that folder to GitHub Pages, Netlify, Vercel static hosting, or any static web host.
-
-## GitHub Pages
-
-This repo includes a GitHub Actions workflow at `.github/workflows/deploy-demo.yml` that deploys the demo automatically to GitHub Pages on every push to `main`.
-
-To enable it:
-
-1. Push this repo to GitHub.
-2. Open the repository settings.
-3. Go to `Pages`.
-4. Set `Source` to `GitHub Actions`.
-
-After that, each push to `main` will rebuild and publish the demo site automatically.
