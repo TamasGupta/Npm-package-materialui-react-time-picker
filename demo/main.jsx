@@ -54,11 +54,64 @@ const demoTheme = {
   tickFontSize: "13px",
 };
 
+const defaultDemoProps = {
+  format: "12h",
+  clockSize: 240,
+  theme: demoTheme,
+};
+
+function buildSampleCode({ format, clockSize, theme }) {
+  return `const pickerProps = {
+  format: "${format}",
+  clockSize: ${clockSize},
+  theme: ${JSON.stringify(theme, null, 2)}
+};
+
+<MD3TimePicker
+  value={value}
+  onChange={setValue}
+  onClose={() => setOpen(false)}
+  {...pickerProps}
+/>`;
+}
+
+function parseSampleCode(source) {
+  const formatMatch = source.match(/format:\s*"(12h|24h)"/);
+  const clockSizeMatch = source.match(/clockSize:\s*(\d+)/);
+  const themeMatch = source.match(/theme:\s*({[\s\S]*?})\s*};/);
+
+  if (!formatMatch) {
+    throw new Error('Missing `format: "12h"` or `format: "24h"`.');
+  }
+
+  if (!clockSizeMatch) {
+    throw new Error("Missing `clockSize: <number>`.");
+  }
+
+  if (!themeMatch) {
+    throw new Error("Missing `theme: { ... }`.");
+  }
+
+  const parsedTheme = Function(`"use strict"; return (${themeMatch[1]});`)();
+
+  if (!parsedTheme || typeof parsedTheme !== "object" || Array.isArray(parsedTheme)) {
+    throw new Error("`theme` must evaluate to an object.");
+  }
+
+  return {
+    format: formatMatch[1],
+    clockSize: Number(clockSizeMatch[1]),
+    theme: parsedTheme,
+  };
+}
+
 function App() {
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState(() => createCurrentTime());
   const [isManualSelection, setIsManualSelection] = useState(false);
-  const [format, setFormat] = useState("12h");
+  const [pickerProps, setPickerProps] = useState(defaultDemoProps);
+  const [sampleCode, setSampleCode] = useState(() => buildSampleCode(defaultDemoProps));
+  const [codeError, setCodeError] = useState("");
   const [preset] = useState(() => {
     const nextValue = new Date();
     nextValue.setHours(9, 30, 0, 0);
@@ -78,6 +131,23 @@ function App() {
     return () => window.clearInterval(timer);
   }, [isManualSelection]);
 
+  const handleApplyCode = () => {
+    try {
+      const nextProps = parseSampleCode(sampleCode);
+      setPickerProps(nextProps);
+      setCodeError("");
+    } catch (error) {
+      setCodeError(error instanceof Error ? error.message : "Invalid sample code.");
+    }
+  };
+
+  const handleResetCode = () => {
+    const nextCode = buildSampleCode(defaultDemoProps);
+    setPickerProps(defaultDemoProps);
+    setSampleCode(nextCode);
+    setCodeError("");
+  };
+
   return (
     <main className="demo-shell">
       <div className="backdrop-orb orb-one" />
@@ -91,23 +161,6 @@ function App() {
             A focused React time picker with a Material Design 3 clock face,
             touch-friendly interactions, and npm-ready packaging.
           </p>
-
-          <div className="format-switch" role="group" aria-label="Time format">
-            <button
-              type="button"
-              className={`format-chip${format === "12h" ? " active" : ""}`}
-              onClick={() => setFormat("12h")}
-            >
-              12h
-            </button>
-            <button
-              type="button"
-              className={`format-chip${format === "24h" ? " active" : ""}`}
-              onClick={() => setFormat("24h")}
-            >
-              24h
-            </button>
-          </div>
 
           <div className="hero-actions">
             <button
@@ -127,9 +180,9 @@ function App() {
         <div className="hero-preview">
           <div className="preview-panel">
             <span className="panel-label">Selected time</span>
-            <p className="preview-time">{formatClockLabel(value, format)}</p>
+            <p className="preview-time">{formatClockLabel(value, pickerProps.format)}</p>
             <p className="preview-copy">
-              {format === "12h"
+              {pickerProps.format === "12h"
                 ? formatTime(value)
                 : `${formatClockLabel(value, "24h")} in 24-hour format`}
             </p>
@@ -138,14 +191,16 @@ function App() {
           <div className="preview-grid">
             <article className="mini-card">
               <span className="mini-label">Preset example</span>
-              <strong>{formatClockLabel(preset, format)}</strong>
+              <strong>{formatClockLabel(preset, pickerProps.format)}</strong>
               <p>Useful for booking flows and schedule forms.</p>
             </article>
             <article className="mini-card">
               <span className="mini-label">Interaction</span>
-              <strong>{format === "12h" ? "Clock + AM/PM" : "Direct 00-23 clock"}</strong>
+              <strong>
+                {pickerProps.format === "12h" ? "Clock + AM/PM" : "Direct 00-23 clock"}
+              </strong>
               <p>
-                {format === "12h"
+                {pickerProps.format === "12h"
                   ? "Tap, click, or drag across the dial to choose time."
                   : "Use the two-ring hour dial to select 00-23 directly."}
               </p>
@@ -165,28 +220,37 @@ function App() {
         </article>
 
         <article className="detail-card">
-          <span className="detail-kicker">Usage shape</span>
-          <pre className="snippet">
-{`<MD3TimePicker
-  value={value}
-  onChange={setValue}
-  onClose={() => setOpen(false)}
-  format="${format}"
-  clockSize={240}
-  theme={{
-    accentColor: "#8e5636",
-    dialogBackground: "#fff7ef"
-  }}
-/>`}
-          </pre>
+          <span className="detail-kicker">Live props editor</span>
+          <p>
+            Edit the sample code, apply it, and reopen the picker to preview the
+            new styling live.
+          </p>
+          <textarea
+            className="snippet-editor"
+            value={sampleCode}
+            onChange={(event) => setSampleCode(event.target.value)}
+            spellCheck={false}
+          />
+          <div className="editor-actions">
+            <button type="button" className="editor-button" onClick={handleApplyCode}>
+              Apply code
+            </button>
+            <button type="button" className="editor-button ghost" onClick={handleResetCode}>
+              Reset
+            </button>
+          </div>
+          {codeError ? <p className="editor-error">{codeError}</p> : null}
         </article>
 
         <article className="detail-card">
           <span className="detail-kicker">Current demo state</span>
           <ul className="stat-list">
-            <li>Selection: {formatClockLabel(value, format)}</li>
+            <li>Selection: {formatClockLabel(value, pickerProps.format)}</li>
             <li>Dialog: {isOpen ? "Open" : "Closed"}</li>
-            <li>Format: {format === "12h" ? "12-hour with AM/PM" : "24-hour direct selection"}</li>
+            <li>
+              Format: {pickerProps.format === "12h" ? "12-hour with AM/PM" : "24-hour direct selection"}
+            </li>
+            <li>Clock size: {pickerProps.clockSize}px</li>
           </ul>
         </article>
       </section>
@@ -194,9 +258,9 @@ function App() {
       {isOpen ? (
         <MD3TimePicker
           value={value}
-          format={format}
-          clockSize={240}
-          theme={demoTheme}
+          format={pickerProps.format}
+          clockSize={pickerProps.clockSize}
+          theme={pickerProps.theme}
           onChange={(nextValue) => {
             setIsManualSelection(true);
             setValue(nextValue);
