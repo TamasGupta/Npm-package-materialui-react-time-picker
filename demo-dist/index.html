@@ -3,11 +3,64 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link id="demo-favicon" rel="icon" type="image/svg+xml" href="/assets/favicon-BQVh65U_.svg" />
     <title>materialui-react-time-picker Demo</title>
     <script type="module" crossorigin src="/assets/index-BxLlKIrw.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-Bi1labF_.css">
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      const favicon = document.getElementById("demo-favicon");
+
+      if (favicon) {
+        const createHand = (length, width, angle) => {
+          const radians = ((angle - 90) * Math.PI) / 180;
+          const x = 32 + Math.cos(radians) * length;
+          const y = 32 + Math.sin(radians) * length;
+          return `<line x1="32" y1="32" x2="${x.toFixed(2)}" y2="${y.toFixed(2)}" stroke="#FFFFFF" stroke-width="${width}" stroke-linecap="round" />`;
+        };
+
+        const renderIcon = (minute, hour) => {
+          const svg = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+              <defs>
+                <linearGradient id="bg" x1="12" y1="8" x2="52" y2="56" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#6750A4" />
+                  <stop offset="1" stop-color="#4F378B" />
+                </linearGradient>
+              </defs>
+              <rect width="64" height="64" rx="16" fill="url(#bg)" />
+              <circle cx="32" cy="32" r="18" fill="none" stroke="#FFFFFF" stroke-width="4" />
+              ${createHand(12, 4, hour)}
+              ${createHand(16, 3, minute)}
+              <circle cx="32" cy="32" r="2.5" fill="#FFFFFF" />
+            </svg>
+          `;
+
+          return `data:image/svg+xml,${encodeURIComponent(svg.replace(/\s+/g, " ").trim())}`;
+        };
+
+        const animationDurationMs = 6000;
+        const maxFps = 12;
+        const minFrameTime = 1000 / maxFps;
+        let lastRenderedAt = 0;
+
+        const animate = (timestamp) => {
+          if (timestamp - lastRenderedAt >= minFrameTime) {
+            const progress = (timestamp % animationDurationMs) / animationDurationMs;
+            const minuteAngle = progress * 360;
+            const hourAngle = (progress * 360) / 12;
+            favicon.href = renderIcon(minuteAngle, hourAngle);
+            lastRenderedAt = timestamp;
+          }
+
+          window.requestAnimationFrame(animate);
+        };
+
+        favicon.href = renderIcon(0, 0);
+        window.requestAnimationFrame(animate);
+      }
+    </script>
   </body>
   </html>
